@@ -2,6 +2,8 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { createDb, DrizzleDB, superheroes } from "./db";
 import { getAuth } from "./lib/auth";
+import { TRUSTED_ORIGINS } from "./lib/constants";
+
 type Variables = {
   DrizzleDB: DrizzleDB;
   auth: ReturnType<typeof getAuth>;
@@ -12,7 +14,7 @@ const app = new Hono<{ Bindings: CloudflareBindings; Variables: Variables }>();
 app.use(
   "*",
   cors({
-    origin: ["http://localhost:3000", "https://cloudflare-vercel-mix-web.vercel.app"],
+    origin: TRUSTED_ORIGINS,
     allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "OPTIONS", "PUT", "DELETE"],
     exposeHeaders: ["Content-Length"],
