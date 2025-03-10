@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { Card } from "@repo/ui/card";
 import ClientSuperheroes from "./client-superheroes";
+import { createSuperhero } from "./actions";
+import { revalidatePath } from "next/cache";
 
 interface Superhero {
   id: number;
@@ -47,6 +49,12 @@ export default async function Page() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/super-heroes`);
   const superheroes = (await res.json()) as Superhero[];
 
+  async function addSuperhero(formData: FormData) {
+    "use server";
+    await createSuperhero(formData);
+    revalidatePath("/");
+  }
+
   return (
     <main className="flex flex-col items-center justify-between min-h-screen p-24">
       <div className="z-10 w-full max-w-5xl">
@@ -56,6 +64,22 @@ export default async function Page() {
           {/* Server Side Fetching */}
           <div className="p-4 border border-gray-800 rounded-lg">
             <h2 className="text-xl font-bold mb-4">Server-side Fetched Superheroes</h2>
+
+            <form action={addSuperhero} className="mb-6">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Enter superhero name"
+                  className="flex-1 px-3 py-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                  required
+                />
+                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                  Add Hero
+                </button>
+              </div>
+            </form>
+
             <ul className="space-y-2">
               {superheroes.map((hero) => (
                 <li key={hero.id} className="p-2 border border-gray-800 rounded">
@@ -75,21 +99,21 @@ export default async function Page() {
           <h2 className="text-2xl font-bold mb-4 text-center">Key Differences</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="p-4 border border-gray-800 rounded-lg">
-              <h3 className="font-bold mb-2">Server-side Fetching</h3>
+              <h3 className="font-bold mb-2">Server-side Implementation</h3>
               <ul className="list-disc pl-4 space-y-2">
-                <li>Data is fetched before page load</li>
-                <li>Better SEO - content is in initial HTML</li>
-                <li>No loading states needed</li>
-                <li>Slower Time to First Byte (TTFB)</li>
+                <li>Uses Next.js Server Actions</li>
+                <li>No client-side state management</li>
+                <li>Automatic page revalidation</li>
+                <li>Progressive enhancement - works without JS</li>
               </ul>
             </div>
             <div className="p-4 border border-gray-800 rounded-lg">
-              <h3 className="font-bold mb-2">Client-side Fetching</h3>
+              <h3 className="font-bold mb-2">Client-side Implementation</h3>
               <ul className="list-disc pl-4 space-y-2">
-                <li>Data is fetched after page load</li>
-                <li>Faster initial page load</li>
-                <li>Requires loading states</li>
-                <li>More interactive - easy to refetch</li>
+                <li>Uses client-side fetch API</li>
+                <li>Manages loading and error states</li>
+                <li>Immediate UI feedback</li>
+                <li>Requires JavaScript</li>
               </ul>
             </div>
           </div>
