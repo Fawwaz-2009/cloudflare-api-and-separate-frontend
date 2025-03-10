@@ -1,9 +1,10 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { createDb, DrizzleDB, superheroes } from "./db";
-
+import { getAuth } from "./lib/auth";
 type Variables = {
   DrizzleDB: DrizzleDB;
+  auth: ReturnType<typeof getAuth>;
 };
 
 const app = new Hono<{ Bindings: CloudflareBindings; Variables: Variables }>();
@@ -12,9 +13,9 @@ app.use(
   "*",
   cors({
     origin: ["http://localhost:3000", "https://cloudflare-vercel-mix-web.vercel.app"],
-    allowHeaders: ["X-Custom-Header", "Upgrade-Insecure-Requests", "Content-Type"],
+    allowHeaders: ["Content-Type", "Authorization"],
     allowMethods: ["POST", "GET", "OPTIONS", "PUT", "DELETE"],
-    exposeHeaders: ["Content-Length", "X-Kuma-Revision"],
+    exposeHeaders: ["Content-Length"],
     maxAge: 600,
     credentials: true,
   })
@@ -22,8 +23,11 @@ app.use(
 
 app.use("*", async (c, next) => {
   c.set("DrizzleDB", createDb(c.env.DB));
+  c.set("auth", getAuth({ BETTER_AUTH_SECRET: c.env.BETTER_AUTH_SECRET, drizzleDB: c.get("DrizzleDB") }));
   await next();
 });
+
+app.on(["POST", "GET"], "/api/auth/**", (c) => c.get("auth").handler(c.req.raw));
 
 app.get("/", (c) => {
   return c.text("Hello Hono!");
