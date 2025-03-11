@@ -1,3 +1,5 @@
+"use client";
+
 import { cookies, headers } from "next/headers";
 import { notFound, redirect, useRouter } from "next/navigation";
 import LogoutButton from "./logout-button";
