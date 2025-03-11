@@ -1,25 +1,28 @@
 import { cookies, headers } from "next/headers";
-import { notFound, redirect } from "next/navigation";
+import { notFound, redirect, useRouter } from "next/navigation";
 import LogoutButton from "./logout-button";
 import { authClient } from "@/lib/auth";
 
 // TODO the isue might be server components or the nextjs, try using clinet components and see how it goes
-export default async function DashboardPage() {
-  const {isPending, data: session} = await authClient.useSession(
-  //   {
-  //   fetchOptions: {
-  //     headers: await headers(),
-  //     credentials: "include",
-  //     onRequest: (request) => {
-  //       console.log(request, "__________________");
-  //     },
-  //   },
-  // }
-);
+export default function DashboardPage() {
+  const { isPending, data: session } = authClient
+    .useSession
+    //   {
+    //   fetchOptions: {
+    //     headers: await headers(),
+    //     credentials: "include",
+    //     onRequest: (request) => {
+    //       console.log(request, "__________________");
+    //     },
+    //   },
+    // }
+    ();
+  const router = useRouter();
   console.log(session, "__________________");
 
   if (!session) {
-    redirect("/auth/login");
+    router.push("/auth/login");
+    return <div>Redirecting to login...</div>;
   }
 
   return (
