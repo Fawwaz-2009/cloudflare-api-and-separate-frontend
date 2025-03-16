@@ -11,6 +11,8 @@ import { seo } from "~/utils/seo";
 
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
   const request = getWebRequest();
+  const headersPremitive = Object.fromEntries(request?.headers.entries() ?? []);
+  console.log(headersPremitive, "headersPremitive________");
   // We need to auth on the server so we have access to secure cookies
   const session = await authClient.getSession({
     fetchOptions: {
