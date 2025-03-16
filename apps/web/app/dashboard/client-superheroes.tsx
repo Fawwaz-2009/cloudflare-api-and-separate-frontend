@@ -58,39 +58,40 @@ export default function ClientSuperheroes() {
     }
   };
 
-  if (error) return <div className="p-4 text-red-500">Error: {error.message}</div>;
+  if (error) return <div className="p-4 text-red-600 bg-red-50 border border-red-200 rounded-md text-sm">Error: {error.message}</div>;
 
   return (
-    <div className="p-4">
-      <h2 className="text-xl font-bold mb-4">Client-side Fetched Superheroes</h2>
-
+    <div>
       <form onSubmit={handleSubmit} className="mb-6">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={newHeroName}
-            onChange={(e) => setNewHeroName(e.target.value)}
-            placeholder="Enter superhero name"
-            className="flex-1 px-3 py-2 bg-gray-700 rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-            disabled={isSubmitting}
-          />
-          <button
-            type="submit"
-            disabled={isSubmitting || !newHeroName.trim()}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? "Adding..." : "Add Hero"}
-          </button>
-        </div>
+        <input
+          type="text"
+          value={newHeroName}
+          onChange={(e) => setNewHeroName(e.target.value)}
+          placeholder="Enter superhero name"
+          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 mb-2"
+          disabled={isSubmitting}
+        />
+        <button
+          type="submit"
+          disabled={isSubmitting || !newHeroName.trim()}
+          className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? "Adding..." : "Add Hero"}
+        </button>
       </form>
 
       {isLoading ? (
-        <div>Loading superheroes...</div>
+        <div className="flex justify-center items-center py-8">
+          <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
+        </div>
+      ) : superheroes.length === 0 ? (
+        <div className="text-center py-4 text-slate-500 text-sm">No superheroes found. Add your first one!</div>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-1 bg-white border border-slate-200 rounded-md overflow-hidden">
           {superheroes.map((hero) => (
-            <li key={hero.id} className="p-2 border border-gray-800 rounded">
-              {hero.name}
+            <li key={hero.id} className="px-4 py-3 border-b border-slate-200 last:border-0">
+              <div className="font-medium">{hero.name}</div>
+              <div className="text-xs text-slate-500">Added on {new Date(hero.createdAt).toLocaleDateString()}</div>
             </li>
           ))}
         </ul>

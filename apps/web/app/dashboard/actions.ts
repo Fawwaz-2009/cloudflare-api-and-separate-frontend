@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 export async function createSuperhero(formData: FormData) {
   const name = formData.get("name") as string;
 
@@ -18,6 +20,7 @@ export async function createSuperhero(formData: FormData) {
   if (!res.ok) {
     throw new Error("Failed to create superhero");
   }
+  revalidatePath("/dashboard");
 
   return res.json();
 }
