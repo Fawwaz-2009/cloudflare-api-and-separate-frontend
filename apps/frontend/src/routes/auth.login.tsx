@@ -10,8 +10,7 @@ function LoginPage() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const router = useRouter()
-
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +19,7 @@ function LoginPage() {
 
     try {
       await authClient.signIn.email({ email, password });
-      await router.invalidate()
+      await router.invalidate();
       navigate({ to: "/dashboard" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to sign in");
@@ -95,4 +94,4 @@ function LoginPage() {
 
 export const Route = createFileRoute("/auth/login")({
   component: LoginPage,
-}); 
+});
