@@ -2,5 +2,6 @@
 
 interface CloudflareBindings {
 	BETTER_AUTH_SECRET: string;
+	BASE_BETTER_AUTH_URL: string;
 	DB: D1Database;
 }

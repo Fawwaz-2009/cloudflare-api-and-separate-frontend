@@ -3,8 +3,9 @@ import { DrizzleDB, schema } from "../db";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { TRUSTED_ORIGINS } from "./constants";
 
-export const getAuth = ({ BETTER_AUTH_SECRET, drizzleDB }: { BETTER_AUTH_SECRET: string; drizzleDB: DrizzleDB }) =>
+export const getAuth = ({ BETTER_AUTH_SECRET, drizzleDB, BASE_BETTER_AUTH_URL }: { BETTER_AUTH_SECRET: string; BASE_BETTER_AUTH_URL: string; drizzleDB: DrizzleDB }) =>
   betterAuth({
+    baseURL: BASE_BETTER_AUTH_URL,
     secret: BETTER_AUTH_SECRET,
     trustedOrigins: TRUSTED_ORIGINS,
     database: drizzleAdapter(drizzleDB, {
@@ -19,6 +20,11 @@ export const getAuth = ({ BETTER_AUTH_SECRET, drizzleDB }: { BETTER_AUTH_SECRET:
       onError: (error, ctx) => {
         // Custom error handling
         console.error("Auth error:", error);
+      },
+    },
+    advanced: {
+      crossSubDomainCookies: {
+        enabled: true,
       },
     },
   });
