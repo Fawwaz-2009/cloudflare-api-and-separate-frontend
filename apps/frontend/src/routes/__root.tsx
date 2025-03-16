@@ -67,6 +67,7 @@ export const Route = createRootRoute({
   }),
   beforeLoad: async () => {
     const session = await getSession();
+    console.log(session, "beforeLoad_session________");
 
     return {
       session,
