@@ -3,7 +3,6 @@ import { cors } from "hono/cors";
 import { createDb, DrizzleDB, superheroes } from "./db";
 import { getAuth } from "./lib/auth";
 import { TRUSTED_ORIGINS } from "./lib/constants";
-import { logger } from "hono/logger";
 
 type Variables = {
   DrizzleDB: DrizzleDB;
@@ -11,8 +10,6 @@ type Variables = {
 };
 
 const app = new Hono<{ Bindings: CloudflareBindings; Variables: Variables }>();
-
-// app.use(logger());
 
 app.use(
   "*",
@@ -28,25 +25,22 @@ app.use(
 
 app.use("*", async (c, next) => {
   c.set("DrizzleDB", createDb(c.env.DB));
-  c.set("auth", getAuth({ BETTER_AUTH_SECRET: c.env.BETTER_AUTH_SECRET, drizzleDB: c.get("DrizzleDB") }));
-  console.log("CONTEXT_SETTINGS_____________________STARTED");
+  c.set("auth", getAuth({ BETTER_AUTH_SECRET: c.env.BETTER_AUTH_SECRET, BASE_BETTER_AUTH_URL: c.env.BASE_BETTER_AUTH_URL, drizzleDB: c.get("DrizzleDB") }));
   await next();
-  console.log("CONTEXT_SETTINGS_____________________ENDED");
 });
 
-app.on(["POST", "GET"], "/api/auth/**", (c) =>
-  c.get("auth")
+app.on(["POST", "GET"], "/api/auth/**", (c) => {
+  return c
+    .get("auth")
     .handler(c.req.raw)
     .then((res) => {
-      c.var.auth.api.getSession
-      console.log(JSON.stringify(res.clone().json()), "response__________________");
+      c.var.auth.api.getSession;
       return res;
     })
     .catch((err) => {
-      console.error(err, "ERROR__________________");
       return c.json({ error: "Unauthorized" }, 401);
-    })
-);
+    });
+});
 
 app.get("/", (c) => {
   return c.text("Hello Hono!");
