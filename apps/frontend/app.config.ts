@@ -1,20 +1,20 @@
-import { defineConfig } from '@tanstack/react-start/config'
-import tsConfigPaths from 'vite-tsconfig-paths'
-import { cloudflare } from 'unenv'
+import { defineConfig } from "@tanstack/react-start/config";
+import tsConfigPaths from "vite-tsconfig-paths";
+import { cloudflare } from "unenv";
 
 export default defineConfig({
   server: {
-    preset: 'cloudflare-pages',
+    preset: "cloudflare-pages",
     unenv: cloudflare,
   },
   tsr: {
-    appDirectory: 'src',
+    appDirectory: "src",
   },
   vite: {
     plugins: [
       tsConfigPaths({
-        projects: ['./tsconfig.json'],
+        projects: ["./tsconfig.json"],
       }),
     ],
   },
-})
+});
