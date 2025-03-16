@@ -1,9 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/_authed')({
+export const Route = createFileRoute("/_authed")({
   beforeLoad: ({ context }) => {
     if (!context.session) {
-      throw new Error('Not authenticated')
+      throw redirect({
+        to: "/auth/login",
+      });
     }
   },
   errorComponent: ({ error }) => {
@@ -11,6 +13,6 @@ export const Route = createFileRoute('/_authed')({
       return <a href="/auth/login">Login</a>;
     }
 
-    throw error
+    throw error;
   },
-})
+});

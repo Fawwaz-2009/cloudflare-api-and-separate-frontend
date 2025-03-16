@@ -5,14 +5,7 @@ import { useEffect } from "react";
 
 function DashboardPage() {
   const navigate = useNavigate();
-  const { isPending, data: session } = authClient.useSession();
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!isPending && !session) {
-      navigate({ to: "/" });
-    }
-  }, [isPending, session, navigate]);
+  const { session } = Route.useLoaderData();
 
   const handleLogout = async () => {
     try {
@@ -23,23 +16,13 @@ function DashboardPage() {
     }
   };
 
-  // Show loading state while checking authentication
-  if (isPending) {
-    return <div className="min-h-screen p-8 flex items-center justify-center">Loading...</div>;
-  }
-
-  // If no session and not pending, we're in the process of redirecting
-  if (!session) {
-    return <div className="min-h-screen p-8 flex items-center justify-center">Redirecting to login...</div>;
-  }
-
   return (
     <div className="min-h-screen p-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
             <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-gray-400">Logged in as: {session.user.email}</p>
+            <p className="text-gray-400">Logged in as: {session?.user.email}</p>
           </div>
           <button onClick={handleLogout} className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
             Sign Out
@@ -71,4 +54,9 @@ function DashboardPage() {
 
 export const Route = createFileRoute("/_authed/dashboard")({
   component: DashboardPage,
+  loader: async ({ context }) => {
+    return {
+      session: context.session?.session ?? null,
+    };
+  },
 });
