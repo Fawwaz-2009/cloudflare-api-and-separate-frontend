@@ -22,6 +22,10 @@ export default function DashboardPage() {
   const router = useRouter();
   console.log(session, "__________________");
 
+  if (isPending) {
+    return <div>Loading...</div>;
+  }
+
   if (!session) {
     router.push("/auth/login");
     return <div>Redirecting to login...</div>;
