@@ -20,7 +20,8 @@ export default async function DashboardPage() {
     },
   });
 
-  console.log(session, "__________________");
+  console.log(JSON.stringify(session), "__________________");
+  console.log(JSON.stringify(session?.user), "__________________");
 
   if (!session) {
     redirect("/auth/login");
