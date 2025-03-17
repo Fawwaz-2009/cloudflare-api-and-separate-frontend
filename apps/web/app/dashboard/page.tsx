@@ -27,6 +27,8 @@ export default async function DashboardPage() {
   const regularFetchResponse = await fetch(`${process.env.NEXT_PUBLIC_BETTER_AUTH_URL}/api/auth/get-session`, {
     headers: headersList,
   });
+  const headersf = Object.fromEntries(headersList.entries());
+  console.log(headersf, "HEADERS __________________");
   const response = await regularFetchResponse.json();
   console.log(regularFetchResponse, "REGULAR FETCH RESPONSE __________________");
   console.log(response, "REGULAR FETCH RESPONSE JSON __________________");
