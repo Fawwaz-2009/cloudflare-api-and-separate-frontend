@@ -1,58 +1,122 @@
-# Turborepo Tailwind CSS starter
+# CloudFront Bridge: Separated Cloudflare API with Multiple Frontend Options
 
-This Turborepo starter is maintained by the Turborepo core team.
+This project demonstrates how to build a Cloudflare-hosted API connected to separate frontend applications. It tackles a common challenge: deploying a Cloudflare Worker backend with standalone frontend apps that share authentication.
 
-## Using this example
+## Project Overview
 
-Run the following command:
+This monorepo contains:
 
-```sh
-npx create-turbo@latest -e with-tailwind
-```
+1. **API Server** (Cloudflare Worker)
+   - Hono-based API with better-auth authentication
+   - Cloudflare D1 database integration
+   - Cross-origin support for multiple frontend deployments
 
-## What's inside?
+2. **Frontend Implementations**
+   - TanStack Router app (Cloudflare Pages) - ✅ Fully compatible
+   - Next.js app (Vercel) - ⚠️ Client-side auth only
 
-This Turborepo includes the following packages/apps:
+## Why This Project Exists
 
-### Apps and Packages
+Setting up a Cloudflare Worker API with separate frontend deployment can be challenging, especially with authentication. This project provides a working reference implementation that:
 
-- `docs`: a [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `web`: another [Next.js](https://nextjs.org/) app with [Tailwind CSS](https://tailwindcss.com/)
-- `ui`: a stub React component library with [Tailwind CSS](https://tailwindcss.com/) shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- Keeps backend and frontend codebases separate for better maintenance
+- Uses Cloudflare's edge network for the API while allowing flexible frontend hosting
+- Implements shared authentication that works across subdomains
+- Demonstrates both a fully functional TanStack implementation and a Next.js implementation with some limitations
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+## Getting Started
 
-### Building packages/ui
+### Server Setup (Cloudflare Worker)
 
-This example is set up to produce compiled styles for `ui` components into the `dist` directory. The component `.tsx` files are consumed by the Next.js apps directly using `transpilePackages` in `next.config.ts`. This was chosen for several reasons:
+1. **Environment Variables**:
+   - Copy `.env.example` to `.env` in the `/apps/server` directory
+   - Set `BETTER_AUTH_SECRET` (keep it consistent across environments)
+   - Set `BASE_BETTER_AUTH_URL` to your root domain (important: this is the domain root, not full API URL)
 
-- Make sharing one `tailwind.config.ts` to apps and packages as easy as possible.
-- Make package compilation simple by only depending on the Next.js Compiler and `tailwindcss`.
-- Ensure Tailwind classes do not overwrite each other. The `ui` package uses a `ui-` prefix for it's classes.
-- Maintain clear package export boundaries.
+2. **Configure Trusted Origins**:
+   - Update `src/lib/constants.ts` with your frontend domains that will access the API
+   ```typescript
+   export const TRUSTED_ORIGINS = [
+     "http://localhost:3000", 
+     "https://your-frontend-domain.com"
+   ];
+   ```
 
-Another option is to consume `packages/ui` directly from source without building. If using this option, you will need to update the `tailwind.config.ts` in your apps to be aware of your package locations, so it can find all usages of the `tailwindcss` class names for CSS compilation.
+3. **Set Up D1 Database**:
+   - Create a D1 database in Cloudflare Dashboard
+   - Update `wrangler.jsonc` with your database ID
+   - Or locally: `npx wrangler d1 create mixer-exp`
 
-For example, in [tailwind.config.ts](packages/tailwind-config/tailwind.config.ts):
+4. **Apply Database Migrations**:
+   - For development: `cd apps/server && pnpm db:migrate:dev`
+   - For production: `cd apps/server && pnpm db:migrate:prod`
 
-```js
-  content: [
-    // app content
-    `src/**/*.{js,ts,jsx,tsx}`,
-    // include packages if not transpiling
-    "../../packages/ui/*.{js,ts,jsx,tsx}",
-  ],
-```
+5. **Deploy**:
+   - `cd apps/server && pnpm deploy`
 
-If you choose this strategy, you can remove the `tailwindcss` and `autoprefixer` dependencies from the `ui` package.
+### TanStack Frontend (Cloudflare Pages)
 
-### Utilities
+1. **Environment Variables**:
+   - Copy `.env.example` to `.env` in the `/apps/frontend` directory
+   - Set `VITE_SERVER_URL` to your API server URL
+   - Set `VITE_BETTER_AUTH_URL` to your API server URL
+   - Set `BETTER_AUTH_SECRET` to match your server's secret
 
-This Turborepo has some additional tools already setup for you:
+2. **Deploy**:
+   - `cd apps/frontend && pnpm build`
+   - Deploy the `dist` directory to Cloudflare Pages
+   - Or locally: `pnpm dev`
 
-- [Tailwind CSS](https://tailwindcss.com/) for styles
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+### Next.js Frontend (Vercel)
+
+1. **Environment Variables**:
+   - Copy `.env.example` to `.env.local` in the `/apps/web` directory
+   - Set `NEXT_PUBLIC_SERVER_URL` to your API server URL
+   - Set `NEXT_PUBLIC_BETTER_AUTH_URL` to your API server URL
+
+2. **Limitations**:
+   - ⚠️ Server-side authentication does not work properly in production
+   - Client-side authentication works correctly
+
+3. **Deploy**:
+   - `cd apps/web && pnpm build`
+   - Deploy to Vercel
+   - Or locally: `pnpm dev`
+
+## Development Workflow
+
+1. Start the server:
+   ```bash
+   cd apps/server && pnpm dev
+   ```
+
+2. Start the frontend of your choice:
+   ```bash
+   # Either TanStack
+   cd apps/frontend && pnpm dev
+   
+   # Or Next.js
+   cd apps/web && pnpm dev
+   ```
+
+## Implementation Notes
+
+### Domain Strategy
+
+For full functionality in production, this setup works best with a domain/subdomain strategy:
+
+- API on `api.yourdomain.com`
+- TanStack frontend on `app.yourdomain.com`
+- Next.js frontend on `www.yourdomain.com`
+
+The `BASE_BETTER_AUTH_URL` should be set to `yourdomain.com` (not the full API URL).
+
+### Authentication
+
+- Uses [better-auth](https://github.com/better-auth/better-auth) for authentication
+- Works with cross-subdomain cookies
+- Server-side auth in Next.js has compatibility issues in production
+
+## License
+
+MIT

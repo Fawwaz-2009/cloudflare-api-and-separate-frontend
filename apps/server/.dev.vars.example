@@ -1,0 +1,11 @@
+# Auth Configuration
+BETTER_AUTH_SECRET=your_auth_secret_key_here
+BASE_BETTER_AUTH_URL=http://localhost:8787
+
+# Cloudflare D1 Database Configuration (for production)
+CLOUDFLARE_ACCOUNT_ID=your_cloudflare_account_id
+DATABASE_ID=your_database_id
+CLOUDFLARE_API_TOKEN=your_api_token
+
+# Note: For local development, wrangler handles the D1 database binding
+# The DB binding is configured in wrangler.jsonc
