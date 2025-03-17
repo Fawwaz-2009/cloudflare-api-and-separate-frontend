@@ -12,8 +12,8 @@ This monorepo contains:
    - Cross-origin support for multiple frontend deployments
 
 2. **Frontend Implementations**
-   - TanStack Router app (Cloudflare Pages) - ✅ Fully compatible
-   - Next.js app (Vercel) - ⚠️ Client-side auth only
+   - [TanStack Router app](https://tanstack.f-stack.dev) (Cloudflare Pages) - ✅ Fully compatible
+   - [Next.js app](https://www.f-stack.dev) (Vercel) - ⚠️ Client-side auth only
 
 ## Why This Project Exists
 
