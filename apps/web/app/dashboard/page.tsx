@@ -1,33 +1,21 @@
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
+"use client";
+import { useRouter } from "next/navigation";
 import LogoutButton from "./logout-button";
 import { authClient } from "@/lib/auth";
-import ClientSuperheroes from "./client-superheroes";
-import { createSuperhero } from "./actions";
+import Link from "next/link";
 
-interface Superhero {
-  id: number;
-  name: string;
-  createdAt: string;
-  updatedAt: string;
-}
+export default function DashboardPage() {
+  const { data: session, isPending } = authClient.useSession();
+  const router = useRouter()
 
-export default async function DashboardPage() {
-  const { data: session } = await authClient.getSession({
-    fetchOptions: {
-      headers: await headers(),
-      credentials: "include",
-    },
-  });
-
-  if (!session) {
-    redirect("/auth/login");
-    return <div>Redirecting to login...</div>;
+  if (isPending) {
+    return <div>Loading...</div>;
   }
 
-  // Server-side fetch
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/super-heroes`);
-  const superheroes = (await res.json()) as Superhero[];
+  if (!session) {
+    router.push("/auth/login");
+    return <div>Redirecting to login...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
@@ -40,70 +28,70 @@ export default async function DashboardPage() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-8">Superheroes Dashboard</h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Server Side Fetching */}
-          <div>
-            <h2 className="text-lg font-medium mb-4">Server-side Fetched</h2>
-
-            <form action={createSuperhero} className="mb-6">
-              <input
-                type="text"
-                name="name"
-                placeholder="Enter superhero name"
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 mb-2"
-                required
-              />
-              <button type="submit" className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md">
-                Add Hero
-              </button>
-            </form>
-
-            {superheroes.length === 0 ? (
-              <div className="text-center py-4 text-slate-500 text-sm">No superheroes found. Add your first one!</div>
-            ) : (
-              <ul className="space-y-1 bg-white border border-slate-200 rounded-md overflow-hidden">
-                {superheroes.map((hero) => (
-                  <li key={hero.id} className="px-4 py-3 border-b border-slate-200 last:border-0">
-                    <div className="font-medium">{hero.name}</div>
-                    <div className="text-xs text-slate-500">Added on {new Date(hero.createdAt).toLocaleDateString()}</div>
-                  </li>
-                ))}
-              </ul>
-            )}
+      <main className="max-w-6xl mx-auto px-4 py-12">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-3xl font-bold text-center mb-8">Next.js Data Fetching Exploration</h1>
+          
+          {/* Implementation Notice */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-8">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <svg className="h-5 w-5 text-amber-400" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 6a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 6zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-amber-800">About This Demo</h3>
+                <p className="mt-1 text-sm text-amber-700">
+                  This is an exploration of different Next.js data fetching approaches. During development, we discovered that while the client-side implementation works in both local and production environments, the server-side approach currently only functions in local development.
+                </p>
+              </div>
+            </div>
           </div>
 
-          {/* Client Side Fetching */}
-          <div>
-            <h2 className="text-lg font-medium mb-4">Client-side Fetched</h2>
-            <ClientSuperheroes />
-          </div>
-        </div>
+          {/* Implementation Cards */}
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+            {/* Client-side Card */}
+            <Link href="/dashboard/client-side" className="group">
+              <div className="h-full bg-white rounded-lg border border-slate-200 p-6 hover:border-blue-400 hover:shadow-md transition duration-150">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-slate-900">Client-side Example</h2>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    Works Everywhere
+                  </span>
+                </div>
+                <p className="text-sm text-slate-600 mb-4">
+                  An implementation using client-side fetching that demonstrates working functionality in both local and production environments.
+                </p>
+                <div className="flex items-center text-blue-600 group-hover:text-blue-700">
+                  View implementation
+                  <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            </Link>
 
-        {/* Key Differences Section */}
-        <div className="mt-12">
-          <h2 className="text-lg font-medium mb-6">Key Differences</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-6 border border-slate-200 rounded-md">
-              <h3 className="font-medium mb-4 text-blue-600">Server-side Implementation</h3>
-              <ul className="space-y-2 text-sm">
-                <li>• Uses Next.js Server Actions</li>
-                <li>• No client-side state management</li>
-                <li>• Automatic page revalidation</li>
-                <li>• Progressive enhancement - works without JS</li>
-              </ul>
-            </div>
-            <div className="bg-white p-6 border border-slate-200 rounded-md">
-              <h3 className="font-medium mb-4 text-blue-600">Client-side Implementation</h3>
-              <ul className="space-y-2 text-sm">
-                <li>• Uses client-side fetch API</li>
-                <li>• Manages loading and error states</li>
-                <li>• Immediate UI feedback</li>
-                <li>• Requires JavaScript</li>
-              </ul>
-            </div>
+            {/* Server-side Card */}
+            <Link href="/dashboard/server-side" className="group">
+              <div className="h-full bg-white rounded-lg border border-slate-200 p-6 hover:border-blue-400 hover:shadow-md transition duration-150">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-lg font-semibold text-slate-900">Server-side Example</h2>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                    Local Dev Only
+                  </span>
+                </div>
+                <p className="text-sm text-slate-600 mb-4">
+                  An exploration of Next.js Server Actions that currently only functions in local development, highlighting deployment considerations.
+                </p>
+                <div className="flex items-center text-blue-600 group-hover:text-blue-700">
+                  View implementation
+                  <svg className="ml-2 w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
       </main>
