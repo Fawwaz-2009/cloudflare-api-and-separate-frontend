@@ -13,26 +13,14 @@ interface Superhero {
 }
 
 export default async function DashboardPage() {
-  const headersList = new Headers(await headers());
-  // const response = await authClient.getSession({
-  //   fetchOptions: {
-  //     headers: headersList,
-  //   },
-  // });
-
-  // console.log(response, "RESPONSE__________________");
-  // console.log(JSON.stringify(response), "JSON STRINGIFY RESPONSE __________________");
-  // console.log(JSON.stringify(response?.data), "JSON STRINGIFY DATA __________________");
-
-  const regularFetchResponse = await fetch(`${process.env.NEXT_PUBLIC_BETTER_AUTH_URL}/api/auth/get-session`, {
-    headers: headersList,
+  const { data: session } = await authClient.getSession({
+    fetchOptions: {
+      headers: await headers(),
+      credentials: "include",
+    },
   });
-  const headersf = Object.fromEntries(regularFetchResponse.headers.entries());
-  console.log(headersf, "HEADERS __________________");
-  const response = await regularFetchResponse.json();
-  console.log(regularFetchResponse, "REGULAR FETCH RESPONSE __________________");
-  console.log(response, "REGULAR FETCH RESPONSE JSON __________________");
-  if (!response) {
+
+  if (!session) {
     redirect("/auth/login");
     return <div>Redirecting to login...</div>;
   }
@@ -46,7 +34,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between">
-          <h1 className="text-2xl font-bold">Hi {response.user.email}</h1>
+          <h1 className="text-2xl font-bold">Hi {session.user.email}</h1>
           <LogoutButton />
         </div>
       </header>
