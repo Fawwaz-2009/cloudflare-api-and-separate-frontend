@@ -23,6 +23,38 @@ app.use(
   })
 );
 
+// Logging middleware
+app.use("*", async (c, next) => {
+  const requestId = crypto.randomUUID();
+  // Log request details
+  console.log(`[Request-${requestId}] Path: ${c.req.path}`);
+  console.log(`[Request-${requestId}] Origin: ${c.req.header("origin") || "No origin"}`);
+  console.log(`[Request-${requestId}] Headers:`, Object.fromEntries(c.req.raw.headers.entries()));
+
+  await next();
+
+  // Log response details
+  console.log(`[Response-${requestId}] Headers:`, Object.fromEntries(c.res.headers.entries()));
+
+  // Try to log response body if it exists and is JSON or text
+  const contentType = c.res.headers.get("content-type");
+  console.log(`content type - ${requestId}: ${contentType}`);
+  if (contentType) {
+    if (contentType.includes("application/json")) {
+      const clone = c.res.clone();
+      const body = await clone.json();
+      console.log(`[Response-${requestId}] Body:`, body);
+    } else if (contentType.includes("text")) {
+      const clone = c.res.clone();
+      const body = await clone.text();
+      console.log(`[Response-${requestId}] Body:`, body);
+    } else {
+      console.log(`[Response-${requestId}] weird content type: ${contentType}`);
+    }
+  }
+});
+
+// DB and Auth middleware
 app.use("*", async (c, next) => {
   c.set("DrizzleDB", createDb(c.env.DB));
   c.set("auth", getAuth({ BETTER_AUTH_SECRET: c.env.BETTER_AUTH_SECRET, BASE_BETTER_AUTH_URL: c.env.BASE_BETTER_AUTH_URL, drizzleDB: c.get("DrizzleDB") }));
