@@ -20,6 +20,8 @@ export default async function DashboardPage() {
     },
   });
 
+  console.log(session, "__________________");
+
   if (!session) {
     redirect("/auth/login");
     return <div>Redirecting to login...</div>;
