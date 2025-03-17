@@ -23,6 +23,11 @@ export default async function DashboardPage() {
   console.log(JSON.stringify(response), "JSON STRINGIFY RESPONSE __________________");
   console.log(JSON.stringify(response?.data), "JSON STRINGIFY DATA __________________");
 
+  const regularFetchResponse = await fetch(`${process.env.BASE_BETTER_AUTH_URL}/api/auth/get-session`, {
+    headers: await headers(),
+  });
+  console.log(regularFetchResponse, "REGULAR FETCH RESPONSE __________________");
+  console.log(await regularFetchResponse.json(), "REGULAR FETCH RESPONSE JSON __________________");
   if (!response?.data) {
     redirect("/auth/login");
     return <div>Redirecting to login...</div>;
