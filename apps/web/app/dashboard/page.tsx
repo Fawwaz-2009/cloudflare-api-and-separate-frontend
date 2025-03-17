@@ -16,7 +16,6 @@ export default async function DashboardPage() {
   const { data: session } = await authClient.getSession({
     fetchOptions: {
       headers: await headers(),
-      credentials: "include",
     },
   });
 
