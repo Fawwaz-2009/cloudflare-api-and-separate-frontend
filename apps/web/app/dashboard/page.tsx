@@ -13,9 +13,10 @@ interface Superhero {
 }
 
 export default async function DashboardPage() {
+  const headersList = await headers();
   const response = await authClient.getSession({
     fetchOptions: {
-      headers: await headers(),
+      headers: headersList,
     },
   });
 
@@ -24,7 +25,7 @@ export default async function DashboardPage() {
   console.log(JSON.stringify(response?.data), "JSON STRINGIFY DATA __________________");
 
   const regularFetchResponse = await fetch(`${process.env.NEXT_PUBLIC_BETTER_AUTH_URL}/api/auth/get-session`, {
-    headers: await headers(),
+    headers: headersList,
   });
   console.log(regularFetchResponse, "REGULAR FETCH RESPONSE __________________");
   console.log(await regularFetchResponse.json(), "REGULAR FETCH RESPONSE JSON __________________");
