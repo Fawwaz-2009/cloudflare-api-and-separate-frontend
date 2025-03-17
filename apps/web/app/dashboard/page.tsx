@@ -13,7 +13,7 @@ interface Superhero {
 }
 
 export default async function DashboardPage() {
-  const headersList = await headers();
+  const headersList = new Headers(await headers());
   // const response = await authClient.getSession({
   //   fetchOptions: {
   //     headers: headersList,
@@ -29,8 +29,8 @@ export default async function DashboardPage() {
   });
   const response = await regularFetchResponse.json();
   console.log(regularFetchResponse, "REGULAR FETCH RESPONSE __________________");
-  console.log(await regularFetchResponse.json(), "REGULAR FETCH RESPONSE JSON __________________");
-  if (!response?.data) {
+  console.log(response, "REGULAR FETCH RESPONSE JSON __________________");
+  if (!response) {
     redirect("/auth/login");
     return <div>Redirecting to login...</div>;
   }
@@ -44,7 +44,7 @@ export default async function DashboardPage() {
       {/* Header */}
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between">
-          <h1 className="text-2xl font-bold">Hi {response.data.user.email}</h1>
+          <h1 className="text-2xl font-bold">Hi {response.user.email}</h1>
           <LogoutButton />
         </div>
       </header>
