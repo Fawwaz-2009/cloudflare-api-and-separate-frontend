@@ -2,6 +2,20 @@
 
 This project demonstrates how to build a Cloudflare-hosted API connected to separate frontend applications. It tackles a common challenge: deploying a Cloudflare Worker backend with standalone frontend apps that share authentication.
 
+## Quick Deploy
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Fawwaz-2009/cloudflare-api-and-separate-frontend&subdirectory=apps/server)
+
+This button will:
+1. Clone the server application to your GitHub account
+2. Set up a Cloudflare Worker with D1 database
+3. Run database migrations automatically
+4. Deploy the API server to Cloudflare
+
+**Note**: After deploying the server, you can clone the created repository and deploy the frontend applications separately:
+- TanStack frontend → Cloudflare Pages
+- Next.js frontend → Vercel
+
 ## Project Overview
 
 This monorepo contains:
@@ -23,6 +37,32 @@ Setting up a Cloudflare Worker API with separate frontend deployment can be chal
 - Uses Cloudflare's edge network for the API while allowing flexible frontend hosting
 - Implements shared authentication that works across subdomains
 - Demonstrates both a fully functional TanStack implementation and a Next.js implementation with some limitations
+
+## Deploy to Cloudflare Instructions
+
+### Using the Deploy Button
+
+1. **Update the Deploy Button URL**: Replace `YOUR_USERNAME/YOUR_REPO_NAME` in the README with your actual GitHub repository path.
+
+2. **Click Deploy**: The Deploy to Cloudflare button will:
+   - Fork the server subdirectory (`apps/server`) to your GitHub account
+   - Create and configure a D1 database automatically
+   - Run database migrations during deployment
+   - Deploy the Worker to your Cloudflare account
+
+3. **Post-Deployment Configuration**:
+   - Update environment variables in Cloudflare dashboard:
+     - Set `BETTER_AUTH_SECRET` (generate a secure random string)
+     - Set `BASE_BETTER_AUTH_URL` to your domain root
+   - Configure custom domain or use the assigned `*.workers.dev` URL
+   - Update `TRUSTED_ORIGINS` in the cloned repository to include your frontend domains
+
+4. **Deploy Frontend Applications**:
+   - Clone the newly created repository from your GitHub account
+   - Copy the frontend apps from the original monorepo
+   - Deploy TanStack frontend to Cloudflare Pages
+   - Deploy Next.js frontend to Vercel
+   - Update frontend environment variables to point to your deployed API
 
 ## Getting Started
 
