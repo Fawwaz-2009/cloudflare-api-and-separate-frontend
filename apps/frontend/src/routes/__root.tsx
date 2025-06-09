@@ -6,7 +6,7 @@ import * as React from "react";
 import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
 import { NotFound } from "@/components/NotFound";
 import { authClient } from "@/lib/auth";
-import appCss from "@/styles/app.css?url";
+import appCss from "@/styles/globals.css?url";
 import { seo } from "@/utils/seo";
 
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
