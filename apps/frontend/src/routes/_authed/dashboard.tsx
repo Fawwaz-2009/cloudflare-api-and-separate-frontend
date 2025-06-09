@@ -12,7 +12,7 @@ interface Superhero {
   updatedAt: string;
 }
 
-const addSuperhero = createServerFn()
+const addSuperhero = createServerFn({ method: "POST" })
   .validator((data: unknown) => {
     if (!(data instanceof FormData)) {
       throw new Error("Invalid form data");
@@ -27,13 +27,14 @@ const addSuperhero = createServerFn()
   })
   .handler(async ({ data }) => {
     const { name } = data;
+    const request = getWebRequest();
+    const headers = new Headers();
+    headers.set("cookie", request?.headers.get("cookie") ?? "");
 
-    const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/super-heroes`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const res = await createServerApi(headers)["super-heroes"].$post({
+      json: {
+        name,
       },
-      body: JSON.stringify({ name }),
     });
 
     if (!res.ok) {
@@ -45,8 +46,8 @@ const addSuperhero = createServerFn()
 
 const getSuperheroes = createServerFn().handler(async () => {
   const request = getWebRequest();
-  const headers = new Headers()
-  headers.set("cookie", request?.headers.get("cookie") ?? "")
+  const headers = new Headers();
+  headers.set("cookie", request?.headers.get("cookie") ?? "");
   const session = await authClient.getSession({
     fetchOptions: {
       headers,
@@ -191,7 +192,8 @@ function ClientSuperheroes() {
 
   const fetchSuperheroes = () => {
     setIsLoading(true);
-    createServerApi()["super-heroes"].$get()
+    createServerApi()
+      ["super-heroes"].$get()
       .then((res) => res.json())
       .then((data) => setSuperheroes(data))
       .catch((error) => setError(error))
@@ -208,12 +210,10 @@ function ClientSuperheroes() {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/super-heroes`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const res = await createServerApi()["super-heroes"].$post({
+        json: {
+          name: newHeroName,
         },
-        body: JSON.stringify({ name: newHeroName }),
       });
 
       if (!res.ok) {
