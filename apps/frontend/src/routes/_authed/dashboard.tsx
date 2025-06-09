@@ -2,7 +2,8 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
 import { useState, useEffect } from "react";
-import { authClient } from "~/lib/auth";
+import { authClient } from "@/lib/auth";
+import { createServerApi } from "@/lib/server";
 
 interface Superhero {
   id: number;
@@ -54,7 +55,7 @@ const getSuperheroes = createServerFn().handler(async () => {
   if (!session.data) {
     throw new Error("Not authenticated");
   }
-  const res = await fetch(`${import.meta.env.VITE_SERVER_URL}/super-heroes`);
+  const res = await createServerApi(headers)["super-heroes"].$get();
   return res.json();
 });
 
@@ -190,7 +191,7 @@ function ClientSuperheroes() {
 
   const fetchSuperheroes = () => {
     setIsLoading(true);
-    fetch(`${import.meta.env.VITE_SERVER_URL}/super-heroes`)
+    createServerApi()["super-heroes"].$get()
       .then((res) => res.json())
       .then((data) => setSuperheroes(data))
       .catch((error) => setError(error))

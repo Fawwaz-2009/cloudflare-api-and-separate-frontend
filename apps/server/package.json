@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "types": "./types.ts",
+  "types": "./src/types.ts",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",
@@ -12,7 +12,6 @@
     "db:local:drop": "drizzle-kit drop",
     "db:local:studio": "drizzle-kit studio",
     "auth:generate": "pnpx @better-auth/cli generate --config auth.config.ts --output src/db/auth-schema.ts"
-
   },
   "dependencies": {
     "@miniflare/d1": "^2.14.4",
@@ -20,7 +19,9 @@
     "better-auth": "^1.2.3",
     "better-sqlite3": "^11.8.1",
     "drizzle-orm": "^0.40.0",
-    "hono": "^4.7.4"
+    "drizzle-zod": "^0.8.2",
+    "hono": "^4.7.4",
+    "zod": "^3.25.56"
   },
   "devDependencies": {
     "@types/node": "^22.13.10",

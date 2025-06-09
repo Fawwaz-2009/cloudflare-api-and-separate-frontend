@@ -3,8 +3,9 @@ import { cors } from "hono/cors";
 import { createDb, DrizzleDB, superheroes } from "./db";
 import { getAuth } from "./lib/auth";
 import { TRUSTED_ORIGINS } from "./lib/constants";
+import { superHeroesRoutes } from "./router/super-heroes";
 
-type Variables = {
+export type Variables = {
   DrizzleDB: DrizzleDB;
   auth: ReturnType<typeof getAuth>;
 };
@@ -78,31 +79,10 @@ app.get("/", (c) => {
   return c.text("Hello Hono!");
 });
 
-app.get("/super-heroes", async (c) => {
-  const db = c.get("DrizzleDB");
-  const superHeroes = await db.query.superheroes.findMany();
-  return c.json(superHeroes);
-});
+const rpcRouter = app.route("/api/super-heroes", superHeroesRoutes);
 
-app.post("/super-heroes", async (c) => {
-  const db = c.get("DrizzleDB");
-  const { name } = await c.req.json();
+export default {
+  fetch: app.fetch,
+};
 
-  if (!name) {
-    return c.json({ error: "Name is required" }, 400);
-  }
-
-  const newHero = await db
-    .insert(superheroes)
-    .values({
-      name,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .returning()
-    .get();
-
-  return c.json(newHero);
-});
-
-export default app;
+export type AppType = typeof rpcRouter;

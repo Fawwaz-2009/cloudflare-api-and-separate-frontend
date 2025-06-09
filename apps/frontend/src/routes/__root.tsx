@@ -3,11 +3,11 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
 import * as React from "react";
-import { DefaultCatchBoundary } from "~/components/DefaultCatchBoundary";
-import { NotFound } from "~/components/NotFound";
-import { authClient } from "~/lib/auth";
-import appCss from "~/styles/app.css?url";
-import { seo } from "~/utils/seo";
+import { DefaultCatchBoundary } from "@/components/DefaultCatchBoundary";
+import { NotFound } from "@/components/NotFound";
+import { authClient } from "@/lib/auth";
+import appCss from "@/styles/app.css?url";
+import { seo } from "@/utils/seo";
 
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
   const request = getWebRequest();
