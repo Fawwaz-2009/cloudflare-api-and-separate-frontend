@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { createDb, DrizzleDB, superheroes } from "./db";
+import { createDb, DrizzleDB, superheroesTable } from "./db";
 import { getAuth } from "./lib/auth";
 import { TRUSTED_ORIGINS } from "./lib/constants";
 import { superHeroesRoutes } from "./router/super-heroes";

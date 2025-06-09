@@ -1,11 +1,11 @@
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
-import { superheroes } from "./db";
+import { superheroesTable } from "./db";
 import { z } from "zod/v4";
 
 export type { AppType } from "./";
 
 // superheroes
-export const superheroesInsertSchema = createInsertSchema(superheroes);
+export const superheroesInsertSchema = createInsertSchema(superheroesTable);
 export type SuperheroesInsert = z.infer<typeof superheroesInsertSchema>;
-export const superheroesSchema = superheroesInsertSchema;
-export type Superheroes = z.infer<typeof superheroesSchema>;
+export const superheroSchema = superheroesInsertSchema;
+export type Superhero = z.infer<typeof superheroSchema>;
