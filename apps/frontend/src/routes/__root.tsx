@@ -8,12 +8,14 @@ import { NotFound } from "@/components/NotFound";
 import { authClient } from "@/lib/auth";
 import appCss from "@/styles/globals.css?url";
 import { seo } from "@/utils/seo";
+import { TanstackQueryProvider } from "@/lib/tanstack-query";
+import { Toaster } from "@/components/ui/sonner";
 
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
   const request = getWebRequest();
   // We need to auth on the server so we have access to secure cookies
-  const headers = new Headers()
-  headers.set("cookie", request?.headers.get("cookie") ?? "")
+  const headers = new Headers();
+  headers.set("cookie", request?.headers.get("cookie") ?? "");
   const session = await authClient.getSession({
     fetchOptions: {
       headers,
@@ -88,7 +90,10 @@ export const Route = createRootRoute({
 function RootComponent() {
   return (
     <RootDocument>
-      <Outlet />
+      <TanstackQueryProvider>
+        <Outlet />
+        <Toaster />
+      </TanstackQueryProvider>
     </RootDocument>
   );
 }

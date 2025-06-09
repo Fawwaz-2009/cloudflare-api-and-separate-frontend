@@ -2,8 +2,15 @@ import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { getWebRequest } from "@tanstack/react-start/server";
 import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth";
 import { createServerApi } from "@/lib/server";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 
 interface Superhero {
   id: number;
@@ -87,187 +94,310 @@ function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900">
-      {/* Simple header with sign out button */}
-      <header className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between">
-          <h1 className="text-2xl font-bold">Hi {session?.user.email}</h1>
-          <button
-            onClick={handleSignOut}
-            disabled={isSigningOut}
-            className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-sm font-medium rounded transition-colors"
-          >
-            {isSigningOut ? "Signing out..." : "Sign Out"}
-          </button>
+    <div className="min-h-screen bg-slate-50">
+      {/* Header */}
+      <header className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+              <p className="text-sm text-gray-600">Welcome back, {session?.user.email}</p>
+            </div>
+            <Button
+              onClick={handleSignOut}
+              disabled={isSigningOut}
+              variant="destructive"
+              size="sm"
+            >
+              {isSigningOut ? "Signing out..." : "Sign Out"}
+            </Button>
+          </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="max-w-6xl mx-auto px-4 py-8">
-        <h1 className="text-2xl font-bold mb-8">Superheroes Dashboard</h1>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Superheroes Management</h2>
+          <p className="text-gray-600">Compare server-side and client-side data fetching approaches</p>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
           {/* Server Side Fetching */}
-          <div>
-            <h2 className="text-lg font-medium mb-4">Server-side Fetched</h2>
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Server-side Implementation</CardTitle>
+                <Badge variant="secondary">Server Actions</Badge>
+              </div>
+              <CardDescription>
+                Data fetched on the server with automatic page revalidation
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <form
+                onSubmit={async (event) => {
+                  event.preventDefault();
+                  const formData = new FormData(event.currentTarget);
+                  const response = await addSuperhero({ data: formData });
+                  router.invalidate();
+                  (event.target as HTMLFormElement).reset();
+                }}
+                className="space-y-3"
+              >
+                <Input
+                  type="text"
+                  name="name"
+                  placeholder="Enter superhero name"
+                  required
+                />
+                <Button type="submit" className="w-full">
+                  Add Hero
+                </Button>
+              </form>
 
-            <form
-              onSubmit={async (event) => {
-                event.preventDefault();
-                const formData = new FormData(event.currentTarget);
-                const response = await addSuperhero({ data: formData });
-                router.invalidate();
-                (event.target as HTMLFormElement).reset();
-              }}
-              className="mb-6"
-            >
-              <input
-                type="text"
-                name="name"
-                placeholder="Enter superhero name"
-                className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 mb-2"
-                required
-              />
-              <button type="submit" className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md">
-                Add Hero
-              </button>
-            </form>
+              <Separator />
 
-            {superheroes.length === 0 ? (
-              <div className="text-center py-4 text-slate-500 text-sm">No superheroes found. Add your first one!</div>
-            ) : (
-              <ul className="space-y-1 bg-white border border-slate-200 rounded-md overflow-hidden">
-                {superheroes.map((hero) => (
-                  <li key={hero.id} className="px-4 py-3 border-b border-slate-200 last:border-0">
-                    <div className="font-medium">{hero.name}</div>
-                    <div className="text-xs text-slate-500">Added on {new Date(hero.createdAt).toLocaleDateString()}</div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+              {superheroes.length === 0 ? (
+                <Alert>
+                  <AlertDescription>
+                    No superheroes found. Add your first one above!
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm text-gray-700 mb-3">
+                    Heroes ({superheroes.length})
+                  </h4>
+                  <div className="space-y-2">
+                    {superheroes.map((hero) => (
+                      <div key={hero.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <div className="font-medium text-gray-900">{hero.name}</div>
+                          <div className="text-xs text-gray-500">
+                            Added on {new Date(hero.createdAt).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <Badge variant="outline">{hero.id}</Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
           {/* Client Side Fetching */}
-          <div>
-            <h2 className="text-lg font-medium mb-4">Client-side Fetched</h2>
-            <ClientSuperheroes />
-          </div>
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <CardTitle>Client-side Implementation</CardTitle>
+                <Badge variant="secondary">TanStack Query</Badge>
+              </div>
+              <CardDescription>
+                Data fetched on the client with smart caching and state management
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ClientSuperheroes />
+            </CardContent>
+          </Card>
         </div>
 
         {/* Key Differences Section */}
-        <div className="mt-12">
-          <h2 className="text-lg font-medium mb-6">Key Differences</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white p-6 border border-slate-200 rounded-md">
-              <h3 className="font-medium mb-4 text-blue-600">Server-side Implementation</h3>
-              <ul className="space-y-2 text-sm">
-                <li>• Uses Next.js Server Actions</li>
-                <li>• No client-side state management</li>
-                <li>• Automatic page revalidation</li>
-                <li>• Progressive enhancement - works without JS</li>
-              </ul>
+        <Card>
+          <CardHeader>
+            <CardTitle>Implementation Comparison</CardTitle>
+            <CardDescription>
+              Understanding the trade-offs between server-side and client-side data fetching
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Badge>Server-side</Badge>
+                  <h3 className="font-semibold text-gray-900">Benefits</h3>
+                </div>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
+                    Uses TanStack Start Server Functions
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
+                    No client-side state management needed
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
+                    Automatic page revalidation after mutations
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 flex-shrink-0"></span>
+                    Progressive enhancement - works without JS
+                  </li>
+                </ul>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline">Client-side</Badge>
+                  <h3 className="font-semibold text-gray-900">Features</h3>
+                </div>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
+                    Uses TanStack Query for smart data fetching
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
+                    Automatic caching and background refetching
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
+                    Built-in loading, error, and optimistic updates
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="w-1.5 h-1.5 bg-blue-500 rounded-full mt-2 flex-shrink-0"></span>
+                    Manual refresh control with query invalidation
+                  </li>
+                </ul>
+              </div>
             </div>
-            <div className="bg-white p-6 border border-slate-200 rounded-md">
-              <h3 className="font-medium mb-4 text-blue-600">Client-side Implementation</h3>
-              <ul className="space-y-2 text-sm">
-                <li>• Uses client-side fetch API</li>
-                <li>• Manages loading and error states</li>
-                <li>• Immediate UI feedback</li>
-                <li>• Requires JavaScript</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       </main>
     </div>
   );
 }
 
 function ClientSuperheroes() {
-  const [superheroes, setSuperheroes] = useState<Superhero[]>([]);
-  const [error, setError] = useState<Error | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [newHeroName, setNewHeroName] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const queryClient = useQueryClient();
 
-  const fetchSuperheroes = () => {
-    setIsLoading(true);
-    createServerApi()
-      ["super-heroes"].$get()
-      .then((res) => res.json())
-      .then((data) => setSuperheroes(data))
-      .catch((error) => setError(error))
-      .finally(() => setIsLoading(false));
-  };
+  // Query for fetching superheroes
+  const {
+    data: superheroes = [],
+    isLoading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['client-superheroes'],
+    queryFn: async () => {
+      const res = await createServerApi()["super-heroes"].$get();
+      if (!res.ok) {
+        throw new Error('Failed to fetch superheroes');
+      }
+      return res.json() as Promise<Superhero[]>;
+    },
+  });
 
-  useEffect(() => {
-    fetchSuperheroes();
-  }, []);
+  // Mutation for adding new superhero
+  const addHeroMutation = useMutation({
+    mutationFn: async (name: string) => {
+      const res = await createServerApi()["super-heroes"].$post({
+        json: { name },
+      });
+      if (!res.ok) {
+        throw new Error("Failed to create superhero");
+      }
+      return res.json();
+    },
+    onSuccess: () => {
+      // Invalidate and refetch the superheroes query
+      queryClient.invalidateQueries({ queryKey: ['client-superheroes'] });
+      // Clear the input
+      setNewHeroName("");
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newHeroName.trim()) return;
-
-    setIsSubmitting(true);
-    try {
-      const res = await createServerApi()["super-heroes"].$post({
-        json: {
-          name: newHeroName,
-        },
-      });
-
-      if (!res.ok) {
-        throw new Error("Failed to create superhero");
-      }
-
-      // Refresh the list
-      fetchSuperheroes();
-      // Clear the input
-      setNewHeroName("");
-    } catch (err) {
-      setError(err as Error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    
+    addHeroMutation.mutate(newHeroName);
   };
 
-  if (error) return <div className="p-4 text-red-600 bg-red-50 border border-red-200 rounded-md text-sm">Error: {error.message}</div>;
+  if (error) {
+    return (
+      <Alert variant="destructive">
+        <AlertDescription>
+          Error: {error instanceof Error ? error.message : 'Something went wrong'}
+        </AlertDescription>
+      </Alert>
+    );
+  }
 
   return (
-    <div>
-      <form onSubmit={handleSubmit} className="mb-6">
-        <input
+    <div className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <Input
           type="text"
           value={newHeroName}
           onChange={(e) => setNewHeroName(e.target.value)}
           placeholder="Enter superhero name"
-          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 mb-2"
-          disabled={isSubmitting}
+          disabled={addHeroMutation.isPending}
         />
-        <button
+        <Button
           type="submit"
-          disabled={isSubmitting || !newHeroName.trim()}
-          className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={addHeroMutation.isPending || !newHeroName.trim()}
+          className="w-full"
         >
-          {isSubmitting ? "Adding..." : "Add Hero"}
-        </button>
+          {addHeroMutation.isPending ? "Adding..." : "Add Hero"}
+        </Button>
       </form>
+
+      {addHeroMutation.isError && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            {addHeroMutation.error instanceof Error 
+              ? addHeroMutation.error.message 
+              : 'Failed to add superhero'
+            }
+          </AlertDescription>
+        </Alert>
+      )}
+
+      <Separator />
 
       {isLoading ? (
         <div className="flex justify-center items-center py-8">
-          <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-600 border-t-transparent"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-2 border-blue-600 border-t-transparent"></div>
         </div>
       ) : superheroes.length === 0 ? (
-        <div className="text-center py-4 text-slate-500 text-sm">No superheroes found. Add your first one!</div>
+        <Alert>
+          <AlertDescription>
+            No superheroes found. Add your first one above!
+          </AlertDescription>
+        </Alert>
       ) : (
-        <ul className="space-y-1 bg-white border border-slate-200 rounded-md overflow-hidden">
-          {superheroes.map((hero) => (
-            <li key={hero.id} className="px-4 py-3 border-b border-slate-200 last:border-0">
-              <div className="font-medium">{hero.name}</div>
-              <div className="text-xs text-slate-500">Added on {new Date(hero.createdAt).toLocaleDateString()}</div>
-            </li>
-          ))}
-        </ul>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h4 className="font-medium text-sm text-gray-700">
+              Heroes ({superheroes.length})
+            </h4>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => refetch()}
+              disabled={isLoading}
+            >
+              {isLoading ? "Refreshing..." : "Refresh"}
+            </Button>
+          </div>
+          <div className="space-y-2">
+            {superheroes.map((hero) => (
+              <div key={hero.id} className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <div className="font-medium text-gray-900">{hero.name}</div>
+                  <div className="text-xs text-gray-500">
+                    Added on {new Date(hero.createdAt).toLocaleDateString()}
+                  </div>
+                </div>
+                <Badge variant="outline">{hero.id}</Badge>
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
