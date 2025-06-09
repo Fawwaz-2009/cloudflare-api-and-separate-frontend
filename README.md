@@ -4,7 +4,7 @@ This project demonstrates how to build a Cloudflare-hosted API connected to sepa
 
 ## Quick Deploy
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Fawwaz-2009/cloudflare-api-and-separate-frontend&subdirectory=apps/server)
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/Fawwaz-2009/cloudflare-api-and-separate-frontend/tree/main/apps/server)
 
 This button will:
 1. Clone the server application to your GitHub account
