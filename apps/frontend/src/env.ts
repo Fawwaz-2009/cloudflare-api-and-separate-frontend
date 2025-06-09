@@ -25,7 +25,7 @@ export const env = createEnv({
    * 💡 You'll get type errors if not all variables from `server` & `client` are included here.
    */
   runtimeEnv: {
-    VITE_SERVER_URL: process.env.VITE_SERVER_URL ?? import.meta.env.VITE_SERVER_URL,
-    VITE_BETTER_AUTH_URL: process.env.VITE_BETTER_AUTH_URL ?? import.meta.env.VITE_BETTER_AUTH_URL,
+    VITE_SERVER_URL: process.env.VITE_SERVER_URL || import.meta.env.VITE_SERVER_URL,
+    VITE_BETTER_AUTH_URL: process.env.VITE_BETTER_AUTH_URL || import.meta.env.VITE_BETTER_AUTH_URL,
   },
 });
