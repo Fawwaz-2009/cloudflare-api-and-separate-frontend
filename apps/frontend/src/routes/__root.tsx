@@ -12,9 +12,11 @@ import { seo } from "~/utils/seo";
 const getSession = createServerFn({ method: "GET" }).handler(async () => {
   const request = getWebRequest();
   // We need to auth on the server so we have access to secure cookies
+  const headers = new Headers()
+  headers.set("cookie", request?.headers.get("cookie") ?? "")
   const session = await authClient.getSession({
     fetchOptions: {
-      headers: request?.headers,
+      headers,
     },
   });
 

@@ -1,5 +1,6 @@
 {
   "name": "server",
+  "types": "./types.ts",
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy --minify",

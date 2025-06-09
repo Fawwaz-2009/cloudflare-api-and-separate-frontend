@@ -9,16 +9,18 @@
     "start": "vinxi start"
   },
   "dependencies": {
-    "@tanstack/react-router": "^1.114.17",
-    "@tanstack/react-router-devtools": "^1.114.17",
-    "@tanstack/react-start": "^1.114.17",
-    "better-auth": "^1.2.3",
+    "@t3-oss/env-core": "^0.13.6",
+    "@tanstack/react-router": "^1.120.15",
+    "@tanstack/react-router-devtools": "^1.120.15",
+    "@tanstack/react-start": "^1.120.15",
+    "better-auth": "^1.2.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "redaxios": "^0.5.1",
+    "server": "workspace:*",
     "tailwind-merge": "^2.6.0",
-    "unenv": "^1.10.0",
-    "vinxi": "0.5.3"
+    "vinxi": "0.5.3",
+    "zod": "^3.25.56"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250303.0",

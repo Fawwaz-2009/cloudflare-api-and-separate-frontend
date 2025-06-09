@@ -44,9 +44,11 @@ const addSuperhero = createServerFn()
 
 const getSuperheroes = createServerFn().handler(async () => {
   const request = getWebRequest();
+  const headers = new Headers()
+  headers.set("cookie", request?.headers.get("cookie") ?? "")
   const session = await authClient.getSession({
     fetchOptions: {
-      headers: request?.headers,
+      headers,
     },
   });
   if (!session.data) {
