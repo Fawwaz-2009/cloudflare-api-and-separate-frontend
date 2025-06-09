@@ -2,6 +2,9 @@
 import { createEnv } from "@t3-oss/env-core";
 import { z } from "zod";
 
+console.log("process.env.VITE_SERVER_URL", process.env.VITE_SERVER_URL)
+console.log("import.meta.env.VITE_SERVER_URL", import.meta.env.VITE_SERVER_URL)
+
 export const env = createEnv({
   /*
    * Serverside Environment variables, not available on the client.
